@@ -96,16 +96,16 @@ for i, test_case in enumerate(test_cases):
         print("--------------------------------")
         for step, action in enumerate(solution):
             blank_index = current_state.index(0)
-            if action == "Up":
+            if action == "Down":
                 next_state = current_state[:]
                 next_state[blank_index], next_state[blank_index - 3] = next_state[blank_index - 3], next_state[blank_index]
-            elif action == "Down":
+            elif action == "Up":
                 next_state = current_state[:]
                 next_state[blank_index], next_state[blank_index + 3] = next_state[blank_index + 3], next_state[blank_index]
-            elif action == "Left":
+            elif action == "Right":
                 next_state = current_state[:]
                 next_state[blank_index], next_state[blank_index - 1] = next_state[blank_index - 1], next_state[blank_index]
-            elif action == "Right":
+            elif action == "Left":
                 next_state = current_state[:]
                 next_state[blank_index], next_state[blank_index + 1] = next_state[blank_index + 1], next_state[blank_index]
             
