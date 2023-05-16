@@ -134,70 +134,47 @@ test_cases = [
     [7, 1, 2, 4, 8, 5, 6, 3, 0],
     [0, 7, 2, 4, 6, 1, 3, 5, 8]
 ]
+# Iterate over the test cases
+for i, test_case in enumerate(test_cases):
+    problem['INITIAL_STATE'] = tuple(test_case)
+    start_time = time.time() # start timer
 
-# Prompt the user to choose the input type
-input_type = input("Choose the input type: (1) Test cases (2) User input: ")
+    # Perform the search
+    #Choose the search algorithm: (1) A* with Manhattan distance heuristic (2) A* with misplaced tiles heuristic (3) Uniform Cost Search (UCS):
+    solution, max_queue_size, nodes_expanded = general_search(problem, queueing_function=PriorityQueue, use_heuristic=2)  # A* with Manhattan distance heuristic
 
-if input_type == '1':
-    # Use test cases
-    print("Available test cases:")
-    for i, test_case in enumerate(test_cases):
-        print(f"Test Case #{i+1}: {test_case}")
+    runtime = time.time() - start_time # end timer
 
-    TC = int(input("Choose the test case (1-8): "))
-    print(f"Test Case #{TC}")
-    problem['INITIAL_STATE'] = tuple(test_cases[TC - 1])
+    # Print the solution and other information
+    print("Test Case #", i+1)
+    if solution == "failure":
+        print("Failed to find a solution.")
+    else:
+        path = []
+        while solution:
+            if solution['ACTION'] is not None:
+                path.insert(0, solution['ACTION'])
+            solution = solution['PARENT']
 
-elif input_type == '2':
-    # User input
-    user_input = input("Enter the initial state of the 3x3 grid (space-separated numbers from 0 to 8, e.g., '1 2 3 4 5 6 7 8 0'): ")
-    initial_state = tuple(map(int, user_input.split()))
+        #print("Solution path:", path)
 
-    problem['INITIAL_STATE'] = initial_state
+        # Display the final state
+        #print("Initial state:")
+        # print_state(problem['INITIAL_STATE'])
+        # current_state = problem['INITIAL_STATE']
+        # for action in path:
+        #     current_state = apply_operator(current_state, action)
+        #     if current_state is None:
+        #         print(f"Action: {action}")
+        #         print("Invalid state")
+        #     else:
+        #         print(f"Action: {action}")
+        #         print_state(current_state)
+        print("Nodes Expanded:", nodes_expanded)
+        print("Max Queue Size:", max_queue_size)
+        print("Depth:", len(path))
+        print("Runtime:", runtime)
+        print()
 
-else:
-    print("Invalid input type. Please try again.")
-    #return
-
-# Prompt the user to choose the search algorithm
-algorithm = input("Choose the search algorithm: (1) A* with Manhattan distance heuristic (2) A* with misplaced tiles heuristic (3) Uniform Cost Search (UCS): ")
-use_heuristic = int(algorithm)
-
-start_time = time.time() # start timer
-solution, max_queue_size, nodes_expanded = general_search(problem, queueing_function=PriorityQueue, use_heuristic=use_heuristic)
-runtime = time.time() - start_time # end timer
-
-# Print the solution
-if solution == "failure":
-    print("Failed to find a solution.")
-else:
-    path = []
-    while solution:
-        if solution['ACTION'] is not None:
-            path.insert(0, solution['ACTION'])
-        solution = solution['PARENT']
-
-    print("Solution path:", path)
-
-    # Display the final state
-    print("Initial state:")
-    print_state(problem['INITIAL_STATE'])
-
-    # Apply actions to the initial state to reach the goal state
-    current_state = problem['INITIAL_STATE']
-    for action in path:
-        current_state = apply_operator(current_state, action)
-        if current_state is None:
-            print(f"Action: {action}")
-            print("Invalid state")
-        else:
-            print(f"Action: {action}")
-            print_state(current_state)
-
-    # Print additional information
-    print("Nodes Expanded:", nodes_expanded)
-    print("Max Queue Size:", max_queue_size)
-    print("Depth:", len(path))
-    print("Runtime:", runtime)
-    print()
+        # Apply actions to the initial state to reach the
     

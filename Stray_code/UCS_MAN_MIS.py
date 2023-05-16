@@ -1,5 +1,4 @@
 from queue import PriorityQueue
-import time
 
 def make_node(state, parent=None, action=None, depth=0, cost=0):
     return {
@@ -123,7 +122,7 @@ def print_state(state):
         print(state[i:i+3])
     print()
 
-# Default test cases given ny Dr. Keogh - (all solvable)
+# Test cases
 test_cases = [
     [1, 2, 3, 4, 5, 6, 7, 8, 0],
     [1, 2, 3, 4, 5, 6, 0, 7, 8],
@@ -135,69 +134,46 @@ test_cases = [
     [0, 7, 2, 4, 6, 1, 3, 5, 8]
 ]
 
-# Prompt the user to choose the input type
-input_type = input("Choose the input type: (1) Test cases (2) User input: ")
-
-if input_type == '1':
-    # Use test cases
-    print("Available test cases:")
-    for i, test_case in enumerate(test_cases):
-        print(f"Test Case #{i+1}: {test_case}")
-
-    TC = int(input("Choose the test case (1-8): "))
-    print(f"Test Case #{TC}")
-    problem['INITIAL_STATE'] = tuple(test_cases[TC - 1])
-
-elif input_type == '2':
-    # User input
-    user_input = input("Enter the initial state of the 3x3 grid (space-separated numbers from 0 to 8, e.g., '1 2 3 4 5 6 7 8 0'): ")
-    initial_state = tuple(map(int, user_input.split()))
-
-    problem['INITIAL_STATE'] = initial_state
-
-else:
-    print("Invalid input type. Please try again.")
-    #return
-
-# Prompt the user to choose the search algorithm
-algorithm = input("Choose the search algorithm: (1) A* with Manhattan distance heuristic (2) A* with misplaced tiles heuristic (3) Uniform Cost Search (UCS): ")
-use_heuristic = int(algorithm)
-
-start_time = time.time() # start timer
-solution, max_queue_size, nodes_expanded = general_search(problem, queueing_function=PriorityQueue, use_heuristic=use_heuristic)
-runtime = time.time() - start_time # end timer
-
-# Print the solution
-if solution == "failure":
-    print("Failed to find a solution.")
-else:
-    path = []
-    while solution:
-        if solution['ACTION'] is not None:
-            path.insert(0, solution['ACTION'])
-        solution = solution['PARENT']
-
-    print("Solution path:", path)
-
-    # Display the final state
-    print("Initial state:")
-    print_state(problem['INITIAL_STATE'])
-
-    # Apply actions to the initial state to reach the goal state
-    current_state = problem['INITIAL_STATE']
-    for action in path:
-        current_state = apply_operator(current_state, action)
-        if current_state is None:
-            print(f"Action: {action}")
-            print("Invalid state")
-        else:
-            print(f"Action: {action}")
-            print_state(current_state)
-
-    # Print additional information
-    print("Nodes Expanded:", nodes_expanded)
-    print("Max Queue Size:", max_queue_size)
-    print("Depth:", len(path))
-    print("Runtime:", runtime)
-    print()
+for i, test_case in enumerate(test_cases):
+    print(f"Test Case #{i+1}")
+    problem['INITIAL_STATE'] = tuple(test_case)
     
+    # Prompt the user to choose the search algorithm
+    algorithm = input("Choose the search algorithm: (1) A* with Manhattan distance heuristic (2) A* with misplaced tiles heuristic (3) Uniform Cost Search (UCS): ")
+    use_heuristic = int(algorithm)
+
+    solution, max_queue_size, nodes_expanded = general_search(problem, queueing_function=PriorityQueue, use_heuristic=use_heuristic)
+
+    # Print the solution
+    if solution == "failure":
+        print("Failed to find a solution.")
+    else:
+        path = []
+        while solution:
+            if solution['ACTION'] is not None:
+                path.insert(0, solution['ACTION'])
+            solution = solution['PARENT']
+
+        print("Solution path:", path)
+
+        # Display the final state
+        print("Final state:")1
+
+        print_state(problem['INITIAL_STATE'])
+
+        # Apply actions to the initial state to reach the goal state
+        current_state = problem['INITIAL_STATE']
+        for action in path:
+            current_state = apply_operator(current_state, action)
+            if current_state is None:
+                print(f"Action: {action}")
+                print("Invalid state")
+            else:
+                print(f"Action: {action}")
+                print_state(current_state)
+
+        # Print additional information
+        print("Nodes Expanded:", nodes_expanded)
+        print("Max Queue Size:", max_queue_size)
+        print("Depth:", len(path))
+        print()

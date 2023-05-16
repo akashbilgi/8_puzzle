@@ -1,5 +1,4 @@
 from queue import PriorityQueue
-import time
 
 def make_node(state, parent=None, action=None, depth=0, cost=0):
     return {
@@ -140,13 +139,48 @@ input_type = input("Choose the input type: (1) Test cases (2) User input: ")
 
 if input_type == '1':
     # Use test cases
-    print("Available test cases:")
     for i, test_case in enumerate(test_cases):
-        print(f"Test Case #{i+1}: {test_case}")
+        print(f"Test Case #{i+1}")
+        problem['INITIAL_STATE'] = tuple(test_case)
 
-    TC = int(input("Choose the test case (1-8): "))
-    print(f"Test Case #{TC}")
-    problem['INITIAL_STATE'] = tuple(test_cases[TC - 1])
+        # Prompt the user to choose the search algorithm
+        algorithm = input("Choose the search algorithm: (1) A* with Manhattan distance heuristic (2) A* with misplaced tiles heuristic (3) Uniform Cost Search (UCS): ")
+        use_heuristic = int(algorithm)
+
+        solution, max_queue_size, nodes_expanded = general_search(problem, queueing_function=PriorityQueue, use_heuristic=use_heuristic)
+
+        # Print the solution
+        if solution == "failure":
+            print("Failed to find a solution.")
+        else:
+            path = []
+            while solution:
+                if solution['ACTION'] is not None:
+                    path.insert(0, solution['ACTION'])
+                solution = solution['PARENT']
+
+            print("Solution path:", path)
+
+            # Display the final state
+            print("Final state:")
+            print_state(problem['INITIAL_STATE'])
+
+            # Apply actions to the initial state to reach the goal state
+            current_state = problem['INITIAL_STATE']
+            for action in path:
+                current_state = apply_operator(current_state, action)
+                if current_state is None:
+                    print(f"Action: {action}")
+                    print("Invalid state")
+                else:
+                    print(f"Action: {action}")
+                    print_state(current_state)
+
+            # Print additional information
+            print("Nodes Expanded:", nodes_expanded)
+            print("Max Queue Size:", max_queue_size)
+            print("Depth:", len(path))
+            print()
 
 elif input_type == '2':
     # User input
@@ -155,49 +189,44 @@ elif input_type == '2':
 
     problem['INITIAL_STATE'] = initial_state
 
+    # Prompt the user to choose the search algorithm
+    algorithm = input("Choose the search algorithm: (1) A* with Manhattan distance heuristic (2) A* with misplaced tiles heuristic (3) Uniform Cost Search (UCS): ")
+    use_heuristic = int(algorithm)
+
+    solution, max_queue_size, nodes_expanded = general_search(problem, queueing_function=PriorityQueue, use_heuristic=use_heuristic)
+
+    # Print the solution
+    if solution == "failure":
+        print("Failed to find a solution.")
+    else:
+        path = []
+        while solution:
+            if solution['ACTION'] is not None:
+                path.insert(0, solution['ACTION'])
+            solution = solution['PARENT']
+
+        print("Solution path:", path)
+
+        # Display the final state
+        print("Final state:")
+        print_state(problem['INITIAL_STATE'])
+
+        # Apply actions to the initial state to reach the goal state
+        current_state = problem['INITIAL_STATE']
+        for action in path:
+            current_state = apply_operator(current_state, action)
+            if current_state is None:
+                print(f"Action: {action}")
+                print("Invalid state")
+            else:
+                print(f"Action: {action}")
+                print_state(current_state)
+
+        # Print additional information
+        print("Nodes Expanded:", nodes_expanded)
+        print("Max Queue Size:", max_queue_size)
+        print("Depth:", len(path))
+        print()
+
 else:
     print("Invalid input type. Please try again.")
-    #return
-
-# Prompt the user to choose the search algorithm
-algorithm = input("Choose the search algorithm: (1) A* with Manhattan distance heuristic (2) A* with misplaced tiles heuristic (3) Uniform Cost Search (UCS): ")
-use_heuristic = int(algorithm)
-
-start_time = time.time() # start timer
-solution, max_queue_size, nodes_expanded = general_search(problem, queueing_function=PriorityQueue, use_heuristic=use_heuristic)
-runtime = time.time() - start_time # end timer
-
-# Print the solution
-if solution == "failure":
-    print("Failed to find a solution.")
-else:
-    path = []
-    while solution:
-        if solution['ACTION'] is not None:
-            path.insert(0, solution['ACTION'])
-        solution = solution['PARENT']
-
-    print("Solution path:", path)
-
-    # Display the final state
-    print("Initial state:")
-    print_state(problem['INITIAL_STATE'])
-
-    # Apply actions to the initial state to reach the goal state
-    current_state = problem['INITIAL_STATE']
-    for action in path:
-        current_state = apply_operator(current_state, action)
-        if current_state is None:
-            print(f"Action: {action}")
-            print("Invalid state")
-        else:
-            print(f"Action: {action}")
-            print_state(current_state)
-
-    # Print additional information
-    print("Nodes Expanded:", nodes_expanded)
-    print("Max Queue Size:", max_queue_size)
-    print("Depth:", len(path))
-    print("Runtime:", runtime)
-    print()
-    

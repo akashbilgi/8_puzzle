@@ -1,5 +1,4 @@
 from queue import PriorityQueue
-import time
 
 def make_node(state, parent=None, action=None, depth=0, cost=0):
     return {
@@ -47,39 +46,14 @@ def apply_operator(state, operator):
     
     return None
 
+
 def goal_test(state):
     return state == (1, 2, 3, 4, 5, 6, 7, 8, 0)
 
-def a_star_heuristic_manhattan(state):
-    # Manhattan distance heuristic
-    h = 0
-    for i in range(len(state)):
-        if state[i] != 0:
-            goal_row = (state[i] - 1) // 3
-            goal_col = (state[i] - 1) % 3
-            current_row = i // 3
-            current_col = i % 3
-            h += abs(goal_row - current_row) + abs(goal_col - current_col)
-    return h
-
-def a_star_heuristic_misplaced(state):
-    # Misplaced tiles heuristic
-    misplaced = 0
-    for i in range(len(state)):
-        if state[i] != 0 and state[i] != i + 1:
-            misplaced += 1
-    return misplaced
-
-def general_search(problem, queueing_function, use_heuristic=False):
+def general_search(problem, queueing_function):
     nodes = PriorityQueue()
     initial_node = make_node(problem['INITIAL_STATE'])
-    if use_heuristic == 1:
-        initial_cost = initial_node['COST'] + a_star_heuristic_manhattan(problem['INITIAL_STATE'])
-    elif use_heuristic == 2:
-         initial_cost = initial_node['COST'] + a_star_heuristic_misplaced(problem['INITIAL_STATE'])
-    else:
-        initial_cost = initial_node['COST']
-    nodes.put((initial_cost, id(initial_node), initial_node))
+    nodes.put((initial_node['COST'], id(initial_node), initial_node))
     visited = set()
     max_queue_size = 1
     nodes_expanded = 0
@@ -95,12 +69,7 @@ def general_search(problem, queueing_function, use_heuristic=False):
 
         for child_node in expand(node, problem['OPERATORS']):
             if child_node['STATE'] not in visited:
-                if use_heuristic == 1:
-                    cost = child_node['COST'] + a_star_heuristic_manhattan(child_node['STATE'])
-                elif use_heuristic == 2:
-                    cost = child_node['COST'] + a_star_heuristic_misplaced(child_node['STATE'])
-                else:
-                    cost = child_node['COST']
+                cost = child_node['COST']
                 nodes.put((cost, id(child_node), child_node))
                 if nodes.qsize() > max_queue_size:
                     max_queue_size = nodes.qsize()
@@ -109,7 +78,7 @@ def general_search(problem, queueing_function, use_heuristic=False):
 
 # Define the problem
 problem = {
-    'INITIAL_STATE': None,
+    'INITIAL_STATE': (1, 2, 3, 4, 5, 6, 0, 7, 8),
     'OPERATORS': ['UP', 'DOWN', 'LEFT', 'RIGHT'],  # Define the available operators for moving the tiles
 }
 
@@ -123,49 +92,9 @@ def print_state(state):
         print(state[i:i+3])
     print()
 
-# Default test cases given ny Dr. Keogh - (all solvable)
-test_cases = [
-    [1, 2, 3, 4, 5, 6, 7, 8, 0],
-    [1, 2, 3, 4, 5, 6, 0, 7, 8],
-    [1, 2, 3, 5, 0, 6, 4, 7, 8],
-    [1, 3, 6, 5, 0, 2, 4, 7, 8],
-    [1, 3, 6, 5, 0, 7, 4, 8, 2],
-    [1, 6, 7, 5, 0, 3, 4, 8, 2],
-    [7, 1, 2, 4, 8, 5, 6, 3, 0],
-    [0, 7, 2, 4, 6, 1, 3, 5, 8]
-]
 
-# Prompt the user to choose the input type
-input_type = input("Choose the input type: (1) Test cases (2) User input: ")
-
-if input_type == '1':
-    # Use test cases
-    print("Available test cases:")
-    for i, test_case in enumerate(test_cases):
-        print(f"Test Case #{i+1}: {test_case}")
-
-    TC = int(input("Choose the test case (1-8): "))
-    print(f"Test Case #{TC}")
-    problem['INITIAL_STATE'] = tuple(test_cases[TC - 1])
-
-elif input_type == '2':
-    # User input
-    user_input = input("Enter the initial state of the 3x3 grid (space-separated numbers from 0 to 8, e.g., '1 2 3 4 5 6 7 8 0'): ")
-    initial_state = tuple(map(int, user_input.split()))
-
-    problem['INITIAL_STATE'] = initial_state
-
-else:
-    print("Invalid input type. Please try again.")
-    #return
-
-# Prompt the user to choose the search algorithm
-algorithm = input("Choose the search algorithm: (1) A* with Manhattan distance heuristic (2) A* with misplaced tiles heuristic (3) Uniform Cost Search (UCS): ")
-use_heuristic = int(algorithm)
-
-start_time = time.time() # start timer
-solution, max_queue_size, nodes_expanded = general_search(problem, queueing_function=PriorityQueue, use_heuristic=use_heuristic)
-runtime = time.time() - start_time # end timer
+# Solve the problem using Uniform Cost Search (UCS)
+solution, max_queue_size, nodes_expanded = general_search(problem, queueing_function=PriorityQueue)
 
 # Print the solution
 if solution == "failure":
@@ -180,7 +109,7 @@ else:
     print("Solution path:", path)
 
     # Display the final state
-    print("Initial state:")
+    print("Final state:")
     print_state(problem['INITIAL_STATE'])
 
     # Apply actions to the initial state to reach the goal state
@@ -196,8 +125,5 @@ else:
 
     # Print additional information
     print("Nodes Expanded:", nodes_expanded)
-    print("Max Queue Size:", max_queue_size)
+    print("Max Queue/Heap Size:", max_queue_size)
     print("Depth:", len(path))
-    print("Runtime:", runtime)
-    print()
-    
