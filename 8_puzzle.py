@@ -3,21 +3,21 @@ import time
 
 def make_node(state, parent=None, action=None, depth=0, cost=0):
     return {
-        'STATE': state,
-        'PARENT': parent,
-        'ACTION': action,
-        'DEPTH': depth,
-        'COST': cost
-    }
+        'STATE': state,    # the current state of the node
+        'PARENT': parent,  # the parent node
+        'ACTION': action,  # the action taken to get to the current state from the parent node
+        'DEPTH': depth,    # the depth of the node in the search tree
+        'COST': cost       # the cost to reach the current node from the initial state
+    }   
 
 def expand(node, operators):
     expanded_nodes = []
     for operator in operators:
-        new_state = apply_operator(node['STATE'], operator)
+        new_state = apply_operator(node['STATE'], operator)  # apply each operator to the current state to generate a new state
         if new_state:
-            child_node = make_node(new_state, parent=node, action=operator, depth=node['DEPTH'] + 1, cost=node['COST'] + 1)
-            expanded_nodes.append(child_node)
-    return expanded_nodes
+            child_node = make_node(new_state, parent=node, action=operator, depth=node['DEPTH'] + 1, cost=node['COST'] + 1)  # create a child node with the new state and other information
+            expanded_nodes.append(child_node)   # add the child node to the list of expanded nodes
+    return expanded_nodes   # return the list of expanded nodes
 
 def apply_operator(state, operator):
     # Implement the logic to apply an operator on the state
@@ -29,19 +29,27 @@ def apply_operator(state, operator):
     empty_tile_index = new_state.index(0)
     
     if operator == 'UP':
+        # Check if the empty tile can move up
         if empty_tile_index >= 3:
+            # Swap the empty tile with the tile above it
             new_state[empty_tile_index], new_state[empty_tile_index - 3] = new_state[empty_tile_index - 3], new_state[empty_tile_index]
             return tuple(new_state)
     elif operator == 'DOWN':
+        # Check if the empty tile can move down
         if empty_tile_index < 6:
+            # Swap the empty tile with the tile below it
             new_state[empty_tile_index], new_state[empty_tile_index + 3] = new_state[empty_tile_index + 3], new_state[empty_tile_index]
             return tuple(new_state)
     elif operator == 'LEFT':
+        # Check if the empty tile can move left
         if empty_tile_index % 3 != 0:
+            # Swap the empty tile with the tile to the left of it
             new_state[empty_tile_index], new_state[empty_tile_index - 1] = new_state[empty_tile_index - 1], new_state[empty_tile_index]
             return tuple(new_state)
     elif operator == 'RIGHT':
+        # Check if the empty tile can move right
         if empty_tile_index % 3 != 2:
+            # Swap the empty tile with the tile to the right of it
             new_state[empty_tile_index], new_state[empty_tile_index + 1] = new_state[empty_tile_index + 1], new_state[empty_tile_index]
             return tuple(new_state)
     
@@ -55,19 +63,19 @@ def a_star_heuristic_manhattan(state):
     h = 0
     for i in range(len(state)):
         if state[i] != 0:
-            goal_row = (state[i] - 1) // 3
-            goal_col = (state[i] - 1) % 3
-            current_row = i // 3
-            current_col = i % 3
-            h += abs(goal_row - current_row) + abs(goal_col - current_col)
+            goal_row = (state[i] - 1) // 3  # Calculate the row index of the goal position for the current tile value
+            goal_col = (state[i] - 1) % 3   # Calculate the column index of the goal position for the current tile value
+            current_row = i // 3            # Calculate the current row index for the tile value
+            current_col = i % 3             # Calculate the current column index for the tile value
+            h += abs(goal_row - current_row) + abs(goal_col - current_col)  # Compute the Manhattan distance between the current and goal positions
     return h
 
 def a_star_heuristic_misplaced(state):
     # Misplaced tiles heuristic
     misplaced = 0
     for i in range(len(state)):
-        if state[i] != 0 and state[i] != i + 1:
-            misplaced += 1
+        if state[i] != 0 and state[i] != i + 1:  # Check if the tile value is not 0 and is misplaced
+            misplaced += 1  # Increment the count of misplaced tiles
     return misplaced
 
 def general_search(problem, queueing_function, use_heuristic=False):
